@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "courseName": "프로그래밍언어론",
+        "credit": 3,
+        "semester": 1,
+        "subjectArea": "전공",
+        "prerequisites": []
+    },
+    {
+        "id": 2,
+        "courseName": "자료구조",
+        "credit": 3,
+        "semester": 2,
+        "subjectArea": "전공",
+        "prerequisites": []
+    },
+    {
+        "id": 3,
+        "courseName": "알고리즘",
+        "credit": 3,
+        "semester": 3,
+        "subjectArea": "전공",
+        "prerequisites": [2]
+    },
+    {
+        "id": 4,
+        "courseName": "인공지능",
+        "credit": 3,
+        "semester": 4,
+        "subjectArea": "전공",
+        "prerequisites": [3]
+    },
+    {
+        "id": 5,
+        "courseName": "웹프로그래밍",
+        "credit": 3,
+        "semester": 3,
+        "subjectArea": "전공",
+        "prerequisites": []
+    }
+]

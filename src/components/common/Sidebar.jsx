@@ -8,7 +8,7 @@ const SidebarContainer = styled.div`
     border-right: 1px solid #e0e0e0;
     padding: 20px;
     height: 100vh;
-    min-width: 120px;
+    min-width: 140px;
     font-size: 1.2rem;
 `;
 
@@ -37,7 +37,7 @@ export default function Sidebar() {
         <SidebarContainer>
             <SidebarTitle>메뉴</SidebarTitle>
             <MenuItem onClick={() => navigate('/timetable')}>시간표 짜기</MenuItem>
-            <MenuItem onClick={() => navigate('/plan')}>4년 수강 계획표</MenuItem>
+            <MenuItem onClick={() => navigate('/plan')}>4개년 수강 계획표</MenuItem>
         </SidebarContainer>
     );
 }
