@@ -1,10 +1,10 @@
 // src/pages/Plan.jsx
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchSearchResults } from '../../redux/slice/searchSlice';
+import styled from 'styled-components';
 import SearchComponent from '../components/Plan/SearchComponent';
 import Sidebar from '../components/common/Sidebar';
+import { fetchSearchResults } from '../../redux/slice/searchSlice';
 
 const PageContainer = styled.div`
     display: flex;
@@ -27,19 +27,24 @@ const Header = styled.div`
 `;
 
 export default function Plan() {
-    const [selectedCourse, setSelectedCourse] = useState(null);
     const dispatch = useDispatch();
+    const { results, loading, error } = useSelector((state) => state.search);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCourse, setSelectedCourse] = useState(null);
 
-    // search slice의 상태가 있는지 확인
-    const { results = [], loading, error } = useSelector((state) => state.search || {});
-
-    const handleSearch = (query) => {
-        dispatch(fetchSearchResults(query));
-    };
+    useEffect(() => {
+        if (searchTerm) {
+            dispatch(fetchSearchResults(searchTerm));
+        }
+    }, [searchTerm, dispatch]);
 
     const handleSelectCourse = (course) => {
         console.log('Selected Course:', course);
         setSelectedCourse(course);
+    };
+
+    const handleSearch = (query) => {
+        setSearchTerm(query);
     };
 
     return (
@@ -47,12 +52,7 @@ export default function Plan() {
             <Sidebar />
             <MainContent>
                 <Header>과목 검색창</Header>
-                <SearchComponent
-                    onSearch={handleSearch}
-                    results={results}
-                    loading={loading}
-                    onSelectCourse={handleSelectCourse}
-                />
+                <SearchComponent onSearch={handleSearch} results={results} onSelectCourse={handleSelectCourse} />
                 {selectedCourse && (
                     <div>
                         <h3>선택된 과목</h3>
@@ -60,6 +60,8 @@ export default function Plan() {
                         <p>학점: {selectedCourse.credit}</p>
                     </div>
                 )}
+                {loading && <p>Loading...</p>}
+                {error && <p>Error: {error}</p>}
             </MainContent>
         </PageContainer>
     );

@@ -1,55 +1,60 @@
 import axios from 'axios';
 
-// 기본 API 인스턴스 설정
+// 베이스 URL 수정
 const api = axios.create({
-    baseURL: 'https://influencerdp.shop', // 여기에 API의 기본 URL을 입력하세요.
+    baseURL: 'http://3.35.184.116', // API의 베이스 URL
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// GET 요청 함수
-export const get = async (url, params = {}) => {
+// API 요청 함수들
+export const fetchData = async (endpoint, params = {}) => {
     try {
-        const response = await api.get(url, { params });
+        const response = await api.get(endpoint, { params });
         return response.data;
     } catch (error) {
-        console.error('GET 요청 오류:', error);
+        if (error.response) {
+            // 서버가 응답을 했으나, 응답 코드가 2xx가 아님
+            console.error('응답 에러:', error.response.status, error.response.data);
+        } else if (error.request) {
+            // 요청이 만들어졌으나 응답을 받지 못함
+            console.error('요청 오류:', error.request);
+        } else {
+            // 다른 에러
+            console.error('설정 오류:', error.message);
+        }
         throw error;
     }
 };
 
 // POST 요청 함수
-export const post = async (url, data) => {
+export const postData = async (endpoint, data = {}, config = {}) => {
     try {
-        const response = await api.post(url, data);
+        const response = await api.post(endpoint, data, config);
         return response.data;
     } catch (error) {
-        console.error('POST 요청 오류:', error);
+        console.error(`POST 요청 실패: ${endpoint}`, error);
         throw error;
     }
 };
 
-// PUT 요청 함수
-export const put = async (url, data) => {
+export const updateData = async (endpoint, data = {}) => {
     try {
-        const response = await api.put(url, data);
+        const response = await api.put(endpoint, data);
         return response.data;
     } catch (error) {
-        console.error('PUT 요청 오류:', error);
+        console.error(`PUT 요청 실패: ${endpoint}`, error);
         throw error;
     }
 };
 
-// DELETE 요청 함수
-export const del = async (url) => {
+export const deleteData = async (endpoint) => {
     try {
-        const response = await api.delete(url);
+        const response = await api.delete(endpoint);
         return response.data;
     } catch (error) {
-        console.error('DELETE 요청 오류:', error);
+        console.error(`DELETE 요청 실패: ${endpoint}`, error);
         throw error;
     }
 };
-
-export default api;

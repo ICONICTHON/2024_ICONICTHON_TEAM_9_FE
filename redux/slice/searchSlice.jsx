@@ -1,10 +1,10 @@
 // src/redux/searchSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../src/services/api';
+import { fetchData } from '../../src/services/api';
 
 export const fetchSearchResults = createAsyncThunk('search/fetchSearchResults', async (query) => {
-    const response = await api.get(`/api/mandatorys/search?name=${query}`);
-    return response.data; // response.data가 배열인지 확인하세요
+    const response = await fetchData(`/api/mandatorys/search`, { name: query });
+    return response.data; // data 배열만 반환
 });
 
 const searchSlice = createSlice({
