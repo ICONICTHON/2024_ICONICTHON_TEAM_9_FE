@@ -23,21 +23,21 @@ const TableHeader = styled.div`
     display: grid;
     grid-template-columns: repeat(7, minmax(80px, 1fr)) repeat(17, minmax(150px, 1fr));
     background-color: #f2f2f2;
-    padding: 8px; /* Match padding with TableRow */
+    padding: 8px;
     font-weight: bold;
     color: #333;
     min-width: 100%;
     width: 3120px;
-    box-sizing: border-box; /* Ensures consistent box sizing */
+    box-sizing: border-box;
 `;
 
 const TableRow = styled.div`
     display: grid;
     grid-template-columns: repeat(7, minmax(80px, 1fr)) repeat(17, minmax(150px, 1fr));
-    padding: 8px; /* Match padding with TableHeader */
+    padding: 8px;
     border-bottom: 1px solid #e0e0e0;
     white-space: nowrap;
-    box-sizing: border-box; /* Ensures consistent box sizing */
+    box-sizing: border-box;
 `;
 
 const Cell = styled.div`
@@ -102,9 +102,24 @@ function SearchResultsTable({ data, onAddCourse }) {
                 </TableHeader>
                 {data.map((item, index) => (
                     <TableRow key={index}>
-                        <Cell>{index + 1}</Cell> {/* Row number */}
+                        <Cell>{index + 1}</Cell>
                         <Cell>
-                            <AddButton onClick={() => onAddCourse(item)}>담기</AddButton>
+                            <AddButton
+                                onClick={() =>
+                                    onAddCourse({
+                                        courseName: item['교과목명'],
+                                        courseCode: item['학수강좌번호'],
+                                        credits: item['학점'],
+                                        teacher: item['교원명'],
+                                        timeSlots: item['요일/교시'] ? item['요일/교시'].split(',') : [],
+                                        room: item['강의실'],
+                                        color: '#FFC3A0',
+                                        courseType: item['교과과정'], // 전공 여부를 저장
+                                    })
+                                }
+                            >
+                                담기
+                            </AddButton>
                         </Cell>
                         {Object.values(item)
                             .slice(1)

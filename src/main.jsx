@@ -9,6 +9,7 @@ import theme from './styles/theme';
 import { Provider } from 'react-redux';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import Footer from './components/common/Footer.jsx';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById('root')).render(
                 <BrowserRouter>
                     <GlobalStyle />
                     <App />
+                    <Footer />
                 </BrowserRouter>
             </DndProvider>
         </ThemeProvider>

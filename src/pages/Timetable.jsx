@@ -49,32 +49,29 @@ export default function Timetable() {
     const [generalCourses, setGeneralCourses] = useState([]);
 
     const handleSearch = () => {
+        // Mock data를 검색 결과로 설정
         setSearchResults(mockData);
     };
 
     const handleAddCourse = (course) => {
-        const isDuplicate = [...majorCourses, ...generalCourses].some((c) => c.courseCode === course['학수강좌번호']);
-
+        // 중복 확인
+        const isDuplicate = [...majorCourses, ...generalCourses].some((c) => c.courseCode === course.courseCode);
         if (isDuplicate) {
             alert('동일한 학수번호의 과목은 담길 수 없습니다!');
             return;
         }
 
-        const courseData = {
-            courseName: course['교과목명'],
-            courseCode: course['학수강좌번호'],
-            credits: course['학점'],
-            color: course.color || '#A7D2CB',
-            timeSlots: course['요일/교시'] ? course['요일/교시'].split(',') : [],
-        };
-
-        if (course['교과과정'] === '전공') {
-            setMajorCourses((prevCourses) => [...prevCourses, courseData]);
+        // 전공 여부에 따라 분리해서 추가
+        if (course.courseType === '전공') {
+            setMajorCourses((prevCourses) => [...prevCourses, course]);
         } else {
-            setGeneralCourses((prevCourses) => [...prevCourses, courseData]);
+            setGeneralCourses((prevCourses) => [...prevCourses, course]);
         }
+    };
 
-        console.log('Added course:', courseData);
+    const handleDeleteCourse = (courseCode) => {
+        setMajorCourses((prevCourses) => prevCourses.filter((course) => course.courseCode !== courseCode));
+        setGeneralCourses((prevCourses) => prevCourses.filter((course) => course.courseCode !== courseCode));
     };
 
     return (
@@ -96,17 +93,25 @@ export default function Timetable() {
 
                 <ContentArea>
                     <LeftSection>
-                        <h3>시간표</h3>
+                        <h2>시간표</h2>
                         <TimeTableComponent />
                     </LeftSection>
                     <RightSection>
                         <div>
                             <h3>전공 과목 목록</h3>
-                            <MajorCourseBubbles courses={majorCourses} />
+                            <MajorCourseBubbles
+                                courses={majorCourses}
+                                onAddToHopeCourses={() => {}}
+                                onDeleteCourse={handleDeleteCourse}
+                            />
                         </div>
                         <div>
                             <h3>교양 과목 목록</h3>
-                            <GeneralCourseBubbles courses={generalCourses} />
+                            <GeneralCourseBubbles
+                                courses={generalCourses}
+                                onAddToHopeCourses={() => {}}
+                                onDeleteCourse={handleDeleteCourse}
+                            />
                         </div>
                     </RightSection>
                 </ContentArea>

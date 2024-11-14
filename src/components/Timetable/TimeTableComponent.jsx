@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useDrop } from 'react-dnd';
 
-const MAX_CREDITS = 18;
-
 const TimeTableContainer = styled.div`
     display: grid;
     grid-template-columns: 80px repeat(5, 1fr);
-    grid-template-rows: repeat(26, 30px); /* 30분 단위로 나누기 위해 26 블록 (오후 9시까지) */
+    grid-template-rows: repeat(31, 30px);
     gap: 2px;
     padding: 20px;
     background-color: #f3f4f6;
@@ -15,6 +13,7 @@ const TimeTableContainer = styled.div`
     border-radius: 10px;
     width: 800px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 0 auto; /* 중앙 정렬 */
 `;
 
 const TimeSlot = styled.div`
@@ -30,10 +29,6 @@ const TimeSlot = styled.div`
     position: relative;
     overflow: hidden;
     cursor: context-menu;
-
-    &:hover {
-        background-color: ${({ color }) => color || '#f1f5f9'};
-    }
 `;
 
 const HeaderCell = styled.div`
@@ -41,19 +36,49 @@ const HeaderCell = styled.div`
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 1rem;
-    color: #4b5563;
-    background-color: #e5e7eb;
+    font-size: 1.5rem;
+    color: ${({ transparent }) => (transparent ? 'transparent' : '#4b5563')};
+    background-color: ${({ transparent }) => (transparent ? 'transparent' : '#e5e7eb')};
     padding: 5px;
-    border: 1px solid #ddd;
     border-radius: 5px;
 `;
 
-const Footer = styled.div`
+const TimeLabel = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #6b7280;
+    padding-left: 30px;
+    padding-bottom: 22px;
+`;
+
+const Header = styled.div`
     margin-top: 20px;
     text-align: center;
-    font-size: 1rem;
+    font-size: 1.8rem;
+    font-weight: 600;
     color: #374151;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    background-color: #edf2f7;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    margin: 20px auto;
+`;
+
+const CreditInput = styled.input`
+    width: 60px;
+    font-size: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
 `;
 
 const ContextMenu = styled.div`
@@ -71,7 +96,6 @@ const ContextMenu = styled.div`
 
 function parseTimeSlots(timeSlots) {
     if (!timeSlots) return [];
-
     const dayMap = { 월: 0, 화: 1, 수: 2, 목: 3, 금: 4 };
     return timeSlots.flatMap((slot) => {
         const [dayPart, timeRange] = slot.split('/');
@@ -80,8 +104,6 @@ function parseTimeSlots(timeSlots) {
             const [hours, minutes] = time.split(':').map(Number);
             return hours + minutes / 60;
         });
-
-        if (day === undefined || start === undefined || end === undefined) return [];
 
         const slots = [];
         for (let time = start; time < end; time += 0.5) {
@@ -94,15 +116,12 @@ function parseTimeSlots(timeSlots) {
 
 function TimeTableComponent() {
     const [credits, setCredits] = useState(0);
-    const [slots, setSlots] = useState(Array(130).fill(null)); // 26시간 블록 * 5일 = 130 슬롯
+    const [maxCredits, setMaxCredits] = useState(21);
+    const [slots, setSlots] = useState(Array(150).fill(null));
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, slotIndex: null });
 
     const handleAddCourse = (course) => {
-        console.log('Adding course:', course);
-
         const timeSlotIndexes = parseTimeSlots(course.timeSlots);
-        console.log('Parsed time slots:', timeSlotIndexes);
-
         const canAdd = timeSlotIndexes.every(({ day, rowIndex }) => !slots[rowIndex * 5 + day]);
 
         if (!canAdd) {
@@ -110,7 +129,7 @@ function TimeTableComponent() {
             return;
         }
 
-        if (credits + course.credits > MAX_CREDITS) {
+        if (credits + course.credits > maxCredits) {
             alert('최대 신청 학점을 초과할 수 없습니다.');
             return;
         }
@@ -126,8 +145,6 @@ function TimeTableComponent() {
 
         setSlots(newSlots);
         setCredits((prevCredits) => prevCredits + course.credits);
-
-        console.log('Updated slots with colors:', newSlots);
     };
 
     const handleRightClick = (event, slotIndex) => {
@@ -142,7 +159,7 @@ function TimeTableComponent() {
         if (slotData) {
             const updatedSlots = slots.map((slot) => (slot && slot.code === slotData.code ? null : slot));
             setSlots(updatedSlots);
-            setCredits((prevCredits) => prevCredits - 3); // adjust credit deduction as needed
+            setCredits((prevCredits) => prevCredits - 3);
             setContextMenu({ ...contextMenu, visible: false });
         }
     };
@@ -165,20 +182,33 @@ function TimeTableComponent() {
         drop: (item) => handleAddCourse(item),
     });
 
+    const times = Array.from({ length: 30 }, (_, i) => {
+        const hour = 8 + Math.floor(i / 2);
+        const minute = i % 2 === 0 ? '00' : '30';
+        return `${hour}:${minute}`;
+    });
+
     return (
         <div>
+            <Header>
+                총 신청 학점: {credits} /
+                <CreditInput
+                    type="number"
+                    value={maxCredits}
+                    onChange={(e) => setMaxCredits(parseInt(e.target.value, 10))}
+                />
+                학점
+            </Header>
             <TimeTableContainer ref={drop}>
-                <HeaderCell></HeaderCell>
+                <HeaderCell transparent />
                 <HeaderCell>월</HeaderCell>
                 <HeaderCell>화</HeaderCell>
                 <HeaderCell>수</HeaderCell>
                 <HeaderCell>목</HeaderCell>
                 <HeaderCell>금</HeaderCell>
-                {[...Array(26)].map((_, hour) => (
+                {times.map((time, hour) => (
                     <React.Fragment key={hour}>
-                        <HeaderCell>
-                            {8 + Math.floor(hour / 2)}:{hour % 2 === 0 ? '00' : '30'}
-                        </HeaderCell>
+                        <TimeLabel>{time}</TimeLabel>
                         {[...Array(5)].map((_, day) => (
                             <TimeSlot
                                 key={`${day}-${hour}`}
@@ -207,10 +237,6 @@ function TimeTableComponent() {
             >
                 시간표에서 삭제
             </ContextMenu>
-
-            <Footer>
-                총 신청 학점: {credits} / {MAX_CREDITS}
-            </Footer>
         </div>
     );
 }
