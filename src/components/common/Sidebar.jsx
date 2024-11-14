@@ -3,11 +3,12 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 const SidebarContainer = styled.div`
-    width: 200px;
+    width: 130px;
     background-color: #ffffff;
     border-right: 1px solid #e0e0e0;
     padding: 20px;
     height: 100vh;
+
     font-size: 1.2rem;
 `;
 

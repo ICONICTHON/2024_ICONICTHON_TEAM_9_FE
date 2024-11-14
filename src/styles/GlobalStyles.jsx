@@ -1,7 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 import reset from 'styled-reset';
 
-//Pretendard 폰트 임포트
+// Pretendard font imports
 import PretendardRegular from '../assets/fonts/Pretendard-Regular.woff2';
 import PretendardBold from '../assets/fonts/Pretendard-Bold.woff2';
 
@@ -21,6 +21,18 @@ const GlobalStyles = createGlobalStyle`
 
   html {
     font-size: 62.5%; /* 1rem = 10px */
+    @media (max-width: 1200px) {
+      font-size: 60%;
+    }
+    @media (max-width: 992px) {
+      font-size: 58%;
+    }
+    @media (max-width: 768px) {
+      font-size: 56%;
+    }
+    @media (max-width: 576px) {
+      font-size: 54%;
+    }
   }
 
   body {
@@ -29,6 +41,7 @@ const GlobalStyles = createGlobalStyle`
     line-height: 1.6;
     margin: 0;
     padding: 0;
+    overflow-x: hidden; /* Prevent horizontal scroll */
   }
 
   a {
@@ -63,12 +76,35 @@ const GlobalStyles = createGlobalStyle`
     outline: none;
   }
 
- 
+  /* Centered container with max width */
   .container {
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
   }
 
+  /* Responsive Typography */
+  h1 {
+    font-size: 2.4rem;
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
 
+  h2 {
+    font-size: 2rem;
+    @media (max-width: 768px) {
+      font-size: 1.8rem;
+    }
+  }
+
+  p, li {
+    font-size: 1.6rem;
+    @media (max-width: 768px) {
+      font-size: 1.4rem;
+    }
+  }
 `;
 
 export default GlobalStyles;

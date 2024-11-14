@@ -7,13 +7,18 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import theme from './styles/theme';
 import { Provider } from 'react-redux';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <ThemeProvider theme={theme}>
-            <BrowserRouter>
-                <GlobalStyle />
-                <App />
-            </BrowserRouter>
+            <DndProvider backend={HTML5Backend}>
+                <BrowserRouter>
+                    <GlobalStyle />
+                    <App />
+                </BrowserRouter>
+            </DndProvider>
         </ThemeProvider>
     </StrictMode>
 );
