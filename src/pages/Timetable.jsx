@@ -53,7 +53,6 @@ export default function Timetable() {
     };
 
     const handleAddCourse = (course) => {
-        // 중복 검사
         const isDuplicate = [...majorCourses, ...generalCourses].some((c) => c.courseCode === course['학수강좌번호']);
 
         if (isDuplicate) {
@@ -64,8 +63,9 @@ export default function Timetable() {
         const courseData = {
             courseName: course['교과목명'],
             courseCode: course['학수강좌번호'],
-            credits: course['학점'], // 학점 정보 추가
-            // 필요한 다른 데이터 추가 가능
+            credits: course['학점'],
+            color: course.color || '#A7D2CB',
+            timeSlots: course['요일/교시'] ? course['요일/교시'].split(',') : [],
         };
 
         if (course['교과과정'] === '전공') {
@@ -73,6 +73,8 @@ export default function Timetable() {
         } else {
             setGeneralCourses((prevCourses) => [...prevCourses, courseData]);
         }
+
+        console.log('Added course:', courseData);
     };
 
     return (
