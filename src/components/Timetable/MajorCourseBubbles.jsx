@@ -6,6 +6,7 @@ const BubblesContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    width: 120px;
     padding: 15px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
