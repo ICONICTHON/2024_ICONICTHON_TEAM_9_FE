@@ -8,7 +8,7 @@ const store = configureStore({
     reducer: {
         flow: flowReducer,
         search: searchReducer,
-        bubbles: bubbleReducer, // Register bubbleReducer
+        bubbles: bubbleReducer,
     },
 });
 

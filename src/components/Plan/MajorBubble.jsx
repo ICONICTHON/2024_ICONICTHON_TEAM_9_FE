@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ReactDOM from 'react-dom';
+import { useDrag } from 'react-dnd';
 
 const Bubble = styled.div`
     background-color: #4caf50;
@@ -18,6 +19,7 @@ const Bubble = styled.div`
     position: relative;
     transition: transform 0.2s, box-shadow 0.2s;
     border: ${(props) => (props.isMandatory ? '3px solid black' : 'none')};
+    cursor: grab;
 
     &:hover {
         transform: scale(1.05);
@@ -77,6 +79,7 @@ const PrerequisiteTitle = styled.div`
 `;
 
 const PrerequisiteBubble = styled.div`
+    // src/components/Plan/MajorBubble.jsx (continued)
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -91,6 +94,15 @@ function MajorBubble({ course }) {
     const [isHover, setIsHover] = useState(false);
     const [hoverPosition, setHoverPosition] = useState({ top: 0, left: 0 });
     const [showPrerequisites, setShowPrerequisites] = useState(false);
+
+    // Set up drag functionality
+    const [{ isDragging }, drag] = useDrag(() => ({
+        type: 'bubble',
+        item: { course },
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    }));
 
     const handleMouseEnter = (event) => {
         const rect = event.target.getBoundingClientRect();
@@ -121,7 +133,12 @@ function MajorBubble({ course }) {
 
     return (
         <>
-            <Bubble isMandatory={isMandatory} onClick={handleMouseEnter}>
+            <Bubble
+                ref={drag}
+                isMandatory={isMandatory}
+                onClick={handleMouseEnter}
+                style={{ opacity: isDragging ? 0.5 : 1 }}
+            >
                 {course.courseName}
             </Bubble>
             {isHover &&

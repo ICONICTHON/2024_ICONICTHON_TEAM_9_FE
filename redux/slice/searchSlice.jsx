@@ -37,7 +37,6 @@ const searchSlice = createSlice({
             .addCase(fetchSearchResults.fulfilled, (state, action) => {
                 state.loading = false;
                 state.results = action.payload;
-                console.log('API response data:', action.payload); // API에서 받아온 JSON 데이터를 콘솔에 출력
             })
             .addCase(fetchSearchResults.rejected, (state, action) => {
                 state.loading = false;

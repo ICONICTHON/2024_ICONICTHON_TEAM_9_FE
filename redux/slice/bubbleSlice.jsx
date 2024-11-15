@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const bubbleSlice = createSlice({
     name: 'bubbles',
     initialState: {
-        bubbles: [], // Initialize bubbles as an empty array
+        bubbles: [],
     },
     reducers: {
         addBubble: (state, action) => {

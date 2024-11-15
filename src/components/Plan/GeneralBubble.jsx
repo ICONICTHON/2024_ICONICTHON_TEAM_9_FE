@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ReactDOM from 'react-dom';
+import { useDrag } from 'react-dnd';
 
 const Bubble = styled.div`
     background-color: #ffeb3b;
@@ -17,6 +18,7 @@ const Bubble = styled.div`
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
     position: relative;
     transition: transform 0.2s, box-shadow 0.2s;
+    cursor: grab;
 
     &:hover {
         transform: scale(1.05);
@@ -91,6 +93,14 @@ function GeneralBubble({ course }) {
     const [hoverPosition, setHoverPosition] = useState({ top: 0, left: 0 });
     const [showPrerequisites, setShowPrerequisites] = useState(false);
 
+    const [{ isDragging }, drag] = useDrag(() => ({
+        type: 'bubble',
+        item: { course },
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    }));
+
     const handleMouseEnter = (event) => {
         const rect = event.target.getBoundingClientRect();
         setHoverPosition({
@@ -119,7 +129,9 @@ function GeneralBubble({ course }) {
 
     return (
         <>
-            <Bubble onClick={handleMouseEnter}>{course.courseName}</Bubble>
+            <Bubble ref={drag} onClick={handleMouseEnter} style={{ opacity: isDragging ? 0.5 : 1 }}>
+                {course.courseName}
+            </Bubble>
             {isHover &&
                 ReactDOM.createPortal(
                     <HoverMenu

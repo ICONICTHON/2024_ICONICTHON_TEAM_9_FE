@@ -7,18 +7,19 @@ import Sidebar from '../components/common/Sidebar';
 import SearchComponent from '../components/Plan/SearchComponent';
 import MajorBubble from '../components/Plan/MajorBubble';
 import GeneralBubble from '../components/Plan/GeneralBubble';
+import CanvasContainer from '../components/Plan/CanvasContainer';
 import { addBubble } from '../../redux/slice/bubbleSlice';
+import { ReactFlowProvider } from 'reactflow';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend'; // DndProvider 백엔드 설정
 
 const PageContainer = styled.div`
     display: flex;
     background-color: #f9f9f9;
-    height: 100vh;
 `;
 
 const SidebarContainer = styled.div`
-    width: 250px;
     background-color: #ffffff;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 `;
 
 const MainContent = styled.div`
@@ -55,27 +56,6 @@ const BubblesContainer = styled.div`
     border-radius: 10px;
     max-width: 1000px;
     white-space: nowrap;
-
-    /* Custom scrollbar styling */
-    scrollbar-width: thin;
-    scrollbar-color: #888 #f1f1f1;
-
-    ::-webkit-scrollbar {
-        height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 10px;
-        &:hover {
-            background: #555;
-        }
-    }
 `;
 
 export default function Plan() {
@@ -88,44 +68,52 @@ export default function Plan() {
     };
 
     return (
-        <PageContainer>
-            <SidebarContainer>
-                <Sidebar />
-            </SidebarContainer>
-            <MainContent>
-                <TopBar>
-                    <SearchSection>
-                        <SearchComponent
-                            onSearch={(query) => dispatch(fetchSearchResults(query))}
-                            results={searchResults}
-                            onSelectCourse={handleSelectCourse}
-                        />
-                    </SearchSection>
-                </TopBar>
+        <DndProvider backend={HTML5Backend}>
+            {' '}
+            {/* DndProvider 추가 */}
+            <PageContainer>
+                <SidebarContainer>
+                    <Sidebar />
+                </SidebarContainer>
+                <MainContent>
+                    <TopBar>
+                        <SearchSection>
+                            <SearchComponent
+                                onSearch={(query) => dispatch(fetchSearchResults(query))}
+                                results={searchResults}
+                                onSelectCourse={handleSelectCourse}
+                            />
+                        </SearchSection>
+                    </TopBar>
 
-                <SectionTitle>전공 과목 목록</SectionTitle>
-                <BubblesContainer>
-                    {bubbles
-                        .filter((course) => course.subjectArea === '전공' || course.subjectArea === '전필')
-                        .map((course) => (
-                            <MajorBubble key={course.id} course={course} />
-                        ))}
-                </BubblesContainer>
+                    <SectionTitle>전공 과목 목록</SectionTitle>
+                    <BubblesContainer>
+                        {bubbles
+                            .filter((course) => course.subjectArea === '전공' || course.subjectArea === '전필')
+                            .map((course) => (
+                                <MajorBubble key={course.id} course={course} />
+                            ))}
+                    </BubblesContainer>
 
-                <SectionTitle>교양 과목 목록</SectionTitle>
-                <BubblesContainer>
-                    {bubbles
-                        .filter(
-                            (course) =>
-                                course.subjectArea === '공통교양' ||
-                                course.subjectArea === 'BSM' ||
-                                course.subjectArea === '기본소양'
-                        )
-                        .map((course) => (
-                            <GeneralBubble key={course.id} course={course} />
-                        ))}
-                </BubblesContainer>
-            </MainContent>
-        </PageContainer>
+                    <SectionTitle>교양 과목 목록</SectionTitle>
+                    <BubblesContainer>
+                        {bubbles
+                            .filter(
+                                (course) =>
+                                    course.subjectArea === '공통교양' ||
+                                    course.subjectArea === 'BSM' ||
+                                    course.subjectArea === '기본소양'
+                            )
+                            .map((course) => (
+                                <GeneralBubble key={course.id} course={course} />
+                            ))}
+                    </BubblesContainer>
+
+                    <ReactFlowProvider>
+                        <CanvasContainer />
+                    </ReactFlowProvider>
+                </MainContent>
+            </PageContainer>
+        </DndProvider>
     );
 }

@@ -1,4 +1,4 @@
-// src/slice/flowSlice.js
+// src/redux/slice/flowSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const flowSlice = createSlice({

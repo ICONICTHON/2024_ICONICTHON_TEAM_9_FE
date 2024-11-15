@@ -15,8 +15,6 @@ import Footer from './components/common/Footer.jsx';
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <Provider store={store}>
-            {' '}
-            {/* Redux Provider로 store 연결 */}
             <ThemeProvider theme={theme}>
                 <DndProvider backend={HTML5Backend}>
                     <BrowserRouter>
