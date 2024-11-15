@@ -49,7 +49,7 @@ const HoverMenu = styled.div`
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
     font-size: 0.9rem;
     color: #333;
-    z-index: 10;
+    z-index: 1000;
     min-width: 240px;
     white-space: nowrap;
     border: 1px solid #ddd;
@@ -118,12 +118,12 @@ function DraggableBubble({ course, color, onAddToHopeCourses, onDeleteCourse }) 
                 <HoverMenu onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>
                     <MenuItem>
                         <strong>
-                            {course.courseName} / {course.teacher}
+                            {course.courseName} / {course.instructorName}
                         </strong>
                     </MenuItem>
-                    <MenuItem>{course.credits} 학점</MenuItem>
-                    <MenuItem>{course.timeSlots.join(', ')}</MenuItem>
-                    <MenuItem>{course.room}</MenuItem>
+                    <MenuItem>{course.credit} 학점</MenuItem>
+                    <MenuItem>{course.classSchedule.join(', ')}</MenuItem>
+                    <MenuItem>{course.classRoom}</MenuItem>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <ActionButton onClick={() => onAddToHopeCourses(course)}>담기</ActionButton>
                         <ActionButton onClick={() => onDeleteCourse(course.courseCode)}>삭제</ActionButton>

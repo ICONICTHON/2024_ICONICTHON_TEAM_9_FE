@@ -13,7 +13,7 @@ const TimeTableContainer = styled.div`
     border-radius: 10px;
     width: 800px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    margin: 0 auto; /* 중앙 정렬 */
+    margin: 0 auto;
 `;
 
 const TimeSlot = styled.div`
@@ -94,15 +94,19 @@ const ContextMenu = styled.div`
     cursor: pointer;
 `;
 
-function parseTimeSlots(timeSlots) {
-    if (!timeSlots) return [];
+function parseTimeSlots(classSchedule) {
+    if (!classSchedule) return [];
     const dayMap = { 월: 0, 화: 1, 수: 2, 목: 3, 금: 4 };
-    return timeSlots.flatMap((slot) => {
+    return classSchedule.flatMap((slot) => {
         const [dayPart, timeRange] = slot.split('/');
         const day = dayMap[dayPart.slice(0, 1)];
         const [start, end] = timeRange.split('-').map((time) => {
             const [hours, minutes] = time.split(':').map(Number);
-            return hours + minutes / 60;
+            let decimalTime = hours + minutes / 60;
+
+            // 50분을 반올림 처리하여 30분 간격에 맞추기
+            decimalTime = Math.round(decimalTime * 2) / 2;
+            return decimalTime;
         });
 
         const slots = [];
@@ -121,7 +125,7 @@ function TimeTableComponent() {
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, slotIndex: null });
 
     const handleAddCourse = (course) => {
-        const timeSlotIndexes = parseTimeSlots(course.timeSlots);
+        const timeSlotIndexes = parseTimeSlots(course.classSchedule);
         const canAdd = timeSlotIndexes.every(({ day, rowIndex }) => !slots[rowIndex * 5 + day]);
 
         if (!canAdd) {
@@ -129,7 +133,7 @@ function TimeTableComponent() {
             return;
         }
 
-        if (credits + course.credits > maxCredits) {
+        if (credits + course.credit > maxCredits) {
             alert('최대 신청 학점을 초과할 수 없습니다.');
             return;
         }
@@ -140,11 +144,12 @@ function TimeTableComponent() {
                 name: course.courseName,
                 code: course.courseCode,
                 color: course.color || '#A7D2CB',
+                credit: course.credit,
             };
         });
 
         setSlots(newSlots);
-        setCredits((prevCredits) => prevCredits + course.credits);
+        setCredits((prevCredits) => prevCredits + course.credit);
     };
 
     const handleRightClick = (event, slotIndex) => {
@@ -158,8 +163,9 @@ function TimeTableComponent() {
         const slotData = slots[contextMenu.slotIndex];
         if (slotData) {
             const updatedSlots = slots.map((slot) => (slot && slot.code === slotData.code ? null : slot));
+            const courseCredits = slotData.credit;
             setSlots(updatedSlots);
-            setCredits((prevCredits) => prevCredits - 3);
+            setCredits((prevCredits) => prevCredits - courseCredits);
             setContextMenu({ ...contextMenu, visible: false });
         }
     };

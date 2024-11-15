@@ -1,23 +1,17 @@
-// redux/slices/flowSlice.js
+// src/slice/flowSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-
-const initialState = {
-    nodes: [],
-    edges: [],
-};
 
 const flowSlice = createSlice({
     name: 'flow',
-    initialState,
+    initialState: {
+        courseBubbles: [],
+    },
     reducers: {
-        setNodes(state, action) {
-            state.nodes = action.payload;
-        },
-        setEdges(state, action) {
-            state.edges = action.payload;
+        addCourseBubble: (state, action) => {
+            state.courseBubbles.push(action.payload);
         },
     },
 });
 
-export const { setNodes, setEdges } = flowSlice.actions;
+export const { addCourseBubble } = flowSlice.actions;
 export default flowSlice.reducer;

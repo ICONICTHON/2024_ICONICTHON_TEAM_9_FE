@@ -11,24 +11,24 @@ const api = axios.create({
 // API 요청 함수들
 export const fetchData = async (endpoint, params = {}) => {
     try {
-        const response = await api.get(endpoint, { params });
+        const filteredParams = Object.fromEntries(
+            Object.entries(params).filter(([_, value]) => value !== null && value !== '-전체-')
+        );
+        const response = await api.get(endpoint, { params: filteredParams });
         return response.data;
     } catch (error) {
         if (error.response) {
-            // 서버가 응답을 했으나, 응답 코드가 2xx가 아님
             console.error('응답 에러:', error.response.status, error.response.data);
         } else if (error.request) {
-            // 요청이 만들어졌으나 응답을 받지 못함
             console.error('요청 오류:', error.request);
         } else {
-            // 다른 에러
             console.error('설정 오류:', error.message);
         }
         throw error;
     }
 };
 
-// POST 요청 함수
+// 나머지 함수들 변경 필요 없음
 export const postData = async (endpoint, data = {}, config = {}) => {
     try {
         const response = await api.post(endpoint, data, config);

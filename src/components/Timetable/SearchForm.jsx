@@ -11,6 +11,7 @@ const Header = styled.div`
     border-bottom: 1px solid #e0e0e0;
     font-size: 1rem;
     gap: 10px;
+    max-width: 1600px;
 `;
 
 const Label = styled.label`
@@ -54,18 +55,45 @@ const SearchButton = styled.button`
 
 function SearchForm({
     curriculum,
-    area,
-    department,
-    major,
+    subjectArea,
+    openingCollege,
+    openingDepartment,
+    openingMajor,
+    campus,
+    lectureCategory,
+    classSchedule,
+    instructorName,
+    keyword,
     onCurriculumChange,
     onAreaChange,
-    onDepartmentChange,
-    onMajorChange,
-    onProfessorChange,
-    onCourseCodeChange,
+    onOpeningCollegeChange,
+    onOpeningDepartmentChange,
+    onOpeningMajorChange,
+    onCampusChange,
+    onLectureCategoryChange,
+    onClassScheduleChange,
+    onInstructorNameChange,
+    onKeywordChange,
     onSearch,
 }) {
-    // Dynamic options based on selection
+    const handleSearchClick = () => {
+        const searchParams = {
+            curriculum: curriculum === '-전체-' ? null : curriculum,
+            subjectArea: subjectArea === '-전체-' ? null : subjectArea,
+            openingCollege: openingCollege === '-전체-' ? null : openingCollege,
+            openingDepartment: openingDepartment === '-전체-' ? null : openingDepartment,
+            openingMajor: openingMajor === '-전체-' ? null : openingMajor,
+            campus: campus === '-전체-' ? null : campus,
+            lectureCategory: lectureCategory === '-전체-' ? null : lectureCategory,
+            classSchedule: classSchedule === '-전체-' ? null : classSchedule,
+            instructorName,
+            keyword,
+        };
+
+        console.log('Sending Search Parameters:', searchParams);
+        onSearch(searchParams);
+    };
+
     const areaOptions = {
         '-전체-': ['-전체-'],
         공통교양: [
@@ -129,7 +157,7 @@ function SearchForm({
 
     const majorOptions = {
         '-전체-': ['-전체-'],
-        AI융합대학: ['-전체-', 'AI융합학부', 'AI소프트웨어융합학부', '시스템반도체학부', 'AI융합대'],
+        AI융합대학: ['-전체-', 'AI융합학부', 'AI소프트웨어융합학부', '시스템반도체학부'],
     };
 
     const specializationOptions = {
@@ -145,6 +173,14 @@ function SearchForm({
         ],
         시스템반도체학부: ['-전체-'],
         AI융합대: ['-전체-'],
+    };
+
+    const handleCurriculumChange = (e) => {
+        onCurriculumChange(e);
+        onAreaChange({ target: { value: '-전체-' } });
+        onOpeningCollegeChange({ target: { value: '-전체-' } });
+        onOpeningDepartmentChange({ target: { value: '-전체-' } });
+        onOpeningMajorChange({ target: { value: '-전체-' } });
     };
 
     return (
@@ -165,23 +201,18 @@ function SearchForm({
             </Dropdown>
 
             <Label>교과과정 :</Label>
-            <Dropdown value={curriculum} onChange={onCurriculumChange}>
+            <Dropdown value={curriculum} onChange={handleCurriculumChange}>
                 <option>-전체-</option>
                 <option>공통교양</option>
                 <option>학문기초</option>
                 <option>일반교양</option>
                 <option>대학전공기초</option>
                 <option>전공</option>
-                <option>교직</option>
-                <option>군사학</option>
-                <option>평생교육</option>
-                <option>자유선택</option>
-                <option>나노디그리</option>
             </Dropdown>
 
             <Label>영역 :</Label>
-            <Dropdown value={area} onChange={onAreaChange}>
-                {areaOptions[curriculum].map((option) => (
+            <Dropdown value={subjectArea} onChange={onAreaChange}>
+                {areaOptions[curriculum]?.map((option) => (
                     <option key={option} value={option}>
                         {option}
                     </option>
@@ -189,7 +220,7 @@ function SearchForm({
             </Dropdown>
 
             <Label>개설대학 :</Label>
-            <Dropdown value={department} onChange={onDepartmentChange}>
+            <Dropdown value={openingCollege} onChange={onOpeningCollegeChange}>
                 {departmentOptions.map((option) => (
                     <option key={option} value={option}>
                         {option}
@@ -198,8 +229,8 @@ function SearchForm({
             </Dropdown>
 
             <Label>개설학과 :</Label>
-            <Dropdown value={major} onChange={onMajorChange}>
-                {(majorOptions[department] || ['-전체-']).map((option) => (
+            <Dropdown value={openingDepartment} onChange={onOpeningDepartmentChange}>
+                {(majorOptions[openingCollege] || ['-전체-']).map((option) => (
                     <option key={option} value={option}>
                         {option}
                     </option>
@@ -207,8 +238,8 @@ function SearchForm({
             </Dropdown>
 
             <Label>개설전공 :</Label>
-            <Dropdown>
-                {(specializationOptions[major] || ['-전체-']).map((option) => (
+            <Dropdown value={openingMajor} onChange={onOpeningMajorChange}>
+                {(specializationOptions[openingDepartment] || ['-전체-']).map((option) => (
                     <option key={option} value={option}>
                         {option}
                     </option>
@@ -216,37 +247,35 @@ function SearchForm({
             </Dropdown>
 
             <Label>수업캠퍼스 :</Label>
-            <Dropdown>
+            <Dropdown value={campus} onChange={onCampusChange}>
+                <option>-전체-</option>
                 <option>서울</option>
                 <option>일산</option>
                 <option>경주</option>
             </Dropdown>
 
             <Label>강의종류 :</Label>
-            <Dropdown>
+            <Dropdown value={lectureCategory} onChange={onLectureCategoryChange}>
                 <option>-전체-</option>
                 <option>일반강의</option>
                 <option>외국어강의</option>
                 <option>현장학습</option>
                 <option>사이버강의</option>
-                <option>영어트랙</option>
             </Dropdown>
 
             <Label>요일 :</Label>
-            <Dropdown>
+            <Dropdown value={classSchedule} onChange={onClassScheduleChange}>
                 <option>-전체-</option>
                 <option>월</option>
                 <option>화</option>
                 <option>수</option>
                 <option>목</option>
                 <option>금</option>
-                <option>토</option>
-                <option>일</option>
             </Dropdown>
 
-            <InputField type="text" placeholder="교원명" onChange={onProfessorChange} />
-            <InputField type="text" placeholder="학수번호/교과목명" onChange={onCourseCodeChange} />
-            <SearchButton onClick={onSearch}>조회</SearchButton>
+            <InputField type="text" placeholder="교원명" value={instructorName} onChange={onInstructorNameChange} />
+            <InputField type="text" placeholder="학수번호/교과목명" value={keyword} onChange={onKeywordChange} />
+            <SearchButton onClick={handleSearchClick}>조회</SearchButton>
         </Header>
     );
 }

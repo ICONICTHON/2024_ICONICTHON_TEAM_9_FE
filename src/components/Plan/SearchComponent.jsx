@@ -69,16 +69,15 @@ function SearchComponent({ onSearch, results = [], onSelectCourse }) {
                     <img src={searchIcon} alt="Search Icon" width="20" height="20" />
                 </IconWrapper>
             </SearchInputWrapper>
-            {Array.isArray(results) &&
-                results.length > 0 && ( // results가 배열인지 확인
-                    <SearchResults>
-                        {results.map((course) => (
-                            <ResultItem key={course.id} onClick={() => onSelectCourse(course)}>
-                                {course.courseName} ({course.credit}학점)
-                            </ResultItem>
-                        ))}
-                    </SearchResults>
-                )}
+            {Array.isArray(results) && results.length > 0 && (
+                <SearchResults>
+                    {results.map((course) => (
+                        <ResultItem key={course.id} onClick={() => onSelectCourse(course)}>
+                            {course.courseName}
+                        </ResultItem>
+                    ))}
+                </SearchResults>
+            )}
         </SearchContainer>
     );
 }

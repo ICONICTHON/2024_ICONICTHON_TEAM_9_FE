@@ -1,3 +1,4 @@
+// src/pages/TimeTable.jsx
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Sidebar from '../components/common/Sidebar';
@@ -6,7 +7,7 @@ import SearchForm from '../components/Timetable/SearchForm';
 import MajorCourseBubbles from '../components/Timetable/MajorCourseBubbles';
 import GeneralCourseBubbles from '../components/Timetable/GeneralCourseBubbles';
 import TimeTableComponent from '../components/Timetable/TimeTableComponent';
-import mockData from '../data/mockData.json';
+import { fetchData } from '../services/api';
 
 const PageContainer = styled.div`
     display: flex;
@@ -19,6 +20,7 @@ const MainContent = styled.div`
     background-color: #f7f7f7;
     display: flex;
     flex-direction: column;
+    max-width: 1600px;
 `;
 
 const ContentArea = styled.div`
@@ -40,29 +42,48 @@ const RightSection = styled.div`
 `;
 
 export default function Timetable() {
-    const [curriculum, setCurriculum] = useState('-전체-');
-    const [area, setArea] = useState('-전체-');
-    const [department, setDepartment] = useState('-전체-');
-    const [major, setMajor] = useState('-전체-');
+    const [searchParams, setSearchParams] = useState({
+        curriculum: '-전체-',
+        subjectArea: '-전체-',
+        openingCollege: '-전체-',
+        openingDepartment: '-전체-',
+        openingMajor: '-전체-',
+        campus: '-전체-',
+        lectureCategory: '-전체-',
+        classSchedule: '-전체-',
+        instructorName: '',
+        keyword: '',
+    });
+
     const [searchResults, setSearchResults] = useState([]);
     const [majorCourses, setMajorCourses] = useState([]);
     const [generalCourses, setGeneralCourses] = useState([]);
 
-    const handleSearch = () => {
-        // Mock data를 검색 결과로 설정
-        setSearchResults(mockData);
+    const handleSearch = async () => {
+        const queryParams = Object.fromEntries(
+            Object.entries(searchParams).filter(([_, value]) => value !== '-전체-' && value !== '')
+        );
+
+        console.log('Sending Query Parameters:', JSON.stringify(queryParams));
+
+        try {
+            const data = await fetchData('/api/lecture-schedules/search', queryParams);
+            console.log('Received Response Data:', data);
+            setSearchResults(data.data || []);
+        } catch (error) {
+            console.error('검색 중 오류가 발생했습니다.', error);
+        }
     };
 
     const handleAddCourse = (course) => {
-        // 중복 확인
         const isDuplicate = [...majorCourses, ...generalCourses].some((c) => c.courseCode === course.courseCode);
         if (isDuplicate) {
             alert('동일한 학수번호의 과목은 담길 수 없습니다!');
             return;
         }
 
-        // 전공 여부에 따라 분리해서 추가
-        if (course.courseType === '전공') {
+        // 전공과 교양 과목 분류 기준을 교과과정 필드(curriculum)로 판단
+        if (course.curriculum === '전공') {
             setMajorCourses((prevCourses) => [...prevCourses, course]);
         } else {
             setGeneralCourses((prevCourses) => [...prevCourses, course]);
@@ -74,44 +95,52 @@ export default function Timetable() {
         setGeneralCourses((prevCourses) => prevCourses.filter((course) => course.courseCode !== courseCode));
     };
 
+    const updateSearchParam = (key, value) => {
+        setSearchParams((prev) => ({ ...prev, [key]: value }));
+    };
+
     return (
         <PageContainer>
             <Sidebar />
             <MainContent>
                 <SearchForm
-                    curriculum={curriculum}
-                    area={area}
-                    department={department}
-                    major={major}
-                    onCurriculumChange={(e) => setCurriculum(e.target.value)}
-                    onAreaChange={(e) => setArea(e.target.value)}
-                    onDepartmentChange={(e) => setDepartment(e.target.value)}
-                    onMajorChange={(e) => setMajor(e.target.value)}
+                    curriculum={searchParams.curriculum}
+                    subjectArea={searchParams.subjectArea}
+                    openingCollege={searchParams.openingCollege}
+                    openingDepartment={searchParams.openingDepartment}
+                    openingMajor={searchParams.openingMajor}
+                    campus={searchParams.campus}
+                    lectureCategory={searchParams.lectureCategory}
+                    classSchedule={searchParams.classSchedule}
+                    instructorName={searchParams.instructorName}
+                    keyword={searchParams.keyword}
+                    onCurriculumChange={(e) => updateSearchParam('curriculum', e.target.value)}
+                    onAreaChange={(e) => updateSearchParam('subjectArea', e.target.value)}
+                    onOpeningCollegeChange={(e) => updateSearchParam('openingCollege', e.target.value)}
+                    onOpeningDepartmentChange={(e) => updateSearchParam('openingDepartment', e.target.value)}
+                    onOpeningMajorChange={(e) => updateSearchParam('openingMajor', e.target.value)}
+                    onCampusChange={(e) => updateSearchParam('campus', e.target.value)}
+                    onLectureCategoryChange={(e) => updateSearchParam('lectureCategory', e.target.value)}
+                    onClassScheduleChange={(e) => updateSearchParam('classSchedule', e.target.value)}
+                    onInstructorNameChange={(e) => updateSearchParam('instructorName', e.target.value)}
+                    onKeywordChange={(e) => updateSearchParam('keyword', e.target.value)}
                     onSearch={handleSearch}
                 />
+
                 <SearchResultsTable data={searchResults} onAddCourse={handleAddCourse} />
 
                 <ContentArea>
                     <LeftSection>
-                        <h2>시간표</h2>
                         <TimeTableComponent />
                     </LeftSection>
                     <RightSection>
                         <div>
                             <h3>전공 과목 목록</h3>
-                            <MajorCourseBubbles
-                                courses={majorCourses}
-                                onAddToHopeCourses={() => {}}
-                                onDeleteCourse={handleDeleteCourse}
-                            />
+                            <MajorCourseBubbles courses={majorCourses} onDeleteCourse={handleDeleteCourse} />
                         </div>
                         <div>
                             <h3>교양 과목 목록</h3>
-                            <GeneralCourseBubbles
-                                courses={generalCourses}
-                                onAddToHopeCourses={() => {}}
-                                onDeleteCourse={handleDeleteCourse}
-                            />
+                            <GeneralCourseBubbles courses={generalCourses} onDeleteCourse={handleDeleteCourse} />
                         </div>
                     </RightSection>
                 </ContentArea>

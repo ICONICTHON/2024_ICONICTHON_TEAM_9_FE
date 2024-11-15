@@ -1,67 +1,104 @@
 // src/pages/Plan.jsx
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import SearchComponent from '../components/Plan/SearchComponent';
-import Sidebar from '../components/common/Sidebar';
 import { fetchSearchResults } from '../../redux/slice/searchSlice';
+import Sidebar from '../components/common/Sidebar';
+import SearchComponent from '../components/Plan/SearchComponent';
+import MajorBubble from '../components/Plan/MajorBubble';
+import GeneralBubble from '../components/Plan/GeneralBubble';
+import { addBubble } from '../../redux/slice/bubbleSlice';
 
 const PageContainer = styled.div`
     display: flex;
-    height: 100vh;
     background-color: #f9f9f9;
+    height: 100vh;
+`;
+
+const SidebarContainer = styled.div`
+    width: 250px;
+    background-color: #ffffff;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 `;
 
 const MainContent = styled.div`
     flex: 1;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    padding: 20px;
 `;
 
-const Header = styled.div`
-    padding-bottom: 20px;
+const TopBar = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+`;
+
+const SearchSection = styled.div`
+    flex: 1;
+`;
+
+const SectionTitle = styled.h2`
+    margin: 20px 0 10px;
     font-size: 1.5rem;
-    font-weight: bold;
+    font-weight: 600;
     color: #333;
+`;
+
+const BubblesContainer = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 `;
 
 export default function Plan() {
     const dispatch = useDispatch();
-    const { results, loading, error } = useSelector((state) => state.search);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCourse, setSelectedCourse] = useState(null);
-
-    useEffect(() => {
-        if (searchTerm) {
-            dispatch(fetchSearchResults(searchTerm));
-        }
-    }, [searchTerm, dispatch]);
+    const searchResults = useSelector((state) => state.search.results);
+    const bubbles = useSelector((state) => state.bubbles.bubbles); // Corrected path to bubbles
 
     const handleSelectCourse = (course) => {
-        console.log('Selected Course:', course);
-        setSelectedCourse(course);
-    };
-
-    const handleSearch = (query) => {
-        setSearchTerm(query);
+        dispatch(addBubble(course));
     };
 
     return (
         <PageContainer>
-            <Sidebar />
+            <SidebarContainer>
+                <Sidebar />
+            </SidebarContainer>
             <MainContent>
-                <Header>과목 검색창</Header>
-                <SearchComponent onSearch={handleSearch} results={results} onSelectCourse={handleSelectCourse} />
-                {selectedCourse && (
-                    <div>
-                        <h3>선택된 과목</h3>
-                        <p>과목명: {selectedCourse.courseName}</p>
-                        <p>학점: {selectedCourse.credit}</p>
-                    </div>
-                )}
-                {loading && <p>Loading...</p>}
-                {error && <p>Error: {error}</p>}
+                <TopBar>
+                    <SearchSection>
+                        <SearchComponent
+                            onSearch={(query) => dispatch(fetchSearchResults(query))}
+                            results={searchResults}
+                            onSelectCourse={handleSelectCourse}
+                        />
+                    </SearchSection>
+                </TopBar>
+
+                <SectionTitle>Major Courses</SectionTitle>
+                <BubblesContainer>
+                    {bubbles
+                        .filter((course) => course.subjectArea === '전공' || course.subjectArea === '전필')
+                        .map((course) => (
+                            <MajorBubble key={course.id} course={course} />
+                        ))}
+                </BubblesContainer>
+
+                <SectionTitle>General Courses</SectionTitle>
+                <BubblesContainer>
+                    {bubbles
+                        .filter(
+                            (course) =>
+                                course.subjectArea === '공통교양' ||
+                                course.subjectArea === 'BSM' ||
+                                course.subjectArea === '기본소양'
+                        )
+                        .map((course) => (
+                            <GeneralBubble key={course.id} course={course} />
+                        ))}
+                </BubblesContainer>
             </MainContent>
         </PageContainer>
     );

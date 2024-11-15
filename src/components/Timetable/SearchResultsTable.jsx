@@ -1,3 +1,4 @@
+// src/components/Timetable/SearchResultsTable.jsx
 import React from 'react';
 import styled from 'styled-components';
 
@@ -70,7 +71,7 @@ const AddButton = styled.button`
     }
 `;
 
-function SearchResultsTable({ data, onAddCourse }) {
+function SearchResultsTable({ data = [], onAddCourse }) {
     return (
         <TableContainer>
             <ScrollableTable>
@@ -107,14 +108,15 @@ function SearchResultsTable({ data, onAddCourse }) {
                             <AddButton
                                 onClick={() =>
                                     onAddCourse({
-                                        courseName: item['교과목명'],
-                                        courseCode: item['학수강좌번호'],
-                                        credits: item['학점'],
-                                        teacher: item['교원명'],
-                                        timeSlots: item['요일/교시'] ? item['요일/교시'].split(',') : [],
-                                        room: item['강의실'],
-                                        color: '#FFC3A0',
-                                        courseType: item['교과과정'], // 전공 여부를 저장
+                                        id: item.id,
+                                        courseName: item.courseName,
+                                        courseCode: item.courseCode,
+                                        credit: item.credit,
+                                        instructorName: item.instructorName,
+                                        classSchedule: item.classSchedule ? item.classSchedule.split(',') : [],
+                                        classRoom: item.classRoom,
+                                        color: item.curriculum === '전공' ? '#A2D2FF' : '#FFD67F',
+                                        curriculum: item.curriculum, // curriculum 속성 추가
                                     })
                                 }
                             >
