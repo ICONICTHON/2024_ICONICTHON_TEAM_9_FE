@@ -1,18 +1,16 @@
-// src/redux/searchSlice.js
+// src/redux/slice/searchSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchData } from '../../src/services/api';
 
-// 비동기 검색 결과 호출을 위한 thunk 생성
 export const fetchSearchResults = createAsyncThunk('search/fetchSearchResults', async (query, { rejectWithValue }) => {
     try {
         const response = await fetchData(`/api/mandatorys/search`, { name: query });
-        return response.data; // `data` 배열만 반환
+        return response.data;
     } catch (error) {
         return rejectWithValue(error.response ? error.response.data : error.message);
     }
 });
 
-// src/redux/slice/searchSlice.js
 const searchSlice = createSlice({
     name: 'search',
     initialState: {
@@ -39,6 +37,7 @@ const searchSlice = createSlice({
             .addCase(fetchSearchResults.fulfilled, (state, action) => {
                 state.loading = false;
                 state.results = action.payload;
+                console.log('API response data:', action.payload); // API에서 받아온 JSON 데이터를 콘솔에 출력
             })
             .addCase(fetchSearchResults.rejected, (state, action) => {
                 state.loading = false;

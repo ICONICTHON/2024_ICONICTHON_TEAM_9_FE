@@ -54,11 +54,19 @@ const ResultItem = styled.div`
 
 function SearchComponent({ onSearch, results = [], onSelectCourse }) {
     const [searchTerm, setSearchTerm] = useState('');
+    const [isResultsVisible, setIsResultsVisible] = useState(false);
 
     const handleSearch = (event) => {
         const query = event.target.value;
         setSearchTerm(query);
         onSearch(query); // 검색어를 전달하여 API 호출
+        setIsResultsVisible(true); // 검색 중에는 결과 표시
+    };
+
+    const handleSelectCourse = (course) => {
+        onSelectCourse(course);
+        setSearchTerm(''); // 검색어 초기화
+        setIsResultsVisible(false); // 리스트 닫기
     };
 
     return (
@@ -69,10 +77,10 @@ function SearchComponent({ onSearch, results = [], onSelectCourse }) {
                     <img src={searchIcon} alt="Search Icon" width="20" height="20" />
                 </IconWrapper>
             </SearchInputWrapper>
-            {Array.isArray(results) && results.length > 0 && (
+            {isResultsVisible && Array.isArray(results) && results.length > 0 && (
                 <SearchResults>
                     {results.map((course) => (
-                        <ResultItem key={course.id} onClick={() => onSelectCourse(course)}>
+                        <ResultItem key={course.id} onClick={() => handleSelectCourse(course)}>
                             {course.courseName}
                         </ResultItem>
                     ))}
